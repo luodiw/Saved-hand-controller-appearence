@@ -1,0 +1,41 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR;
+
+public class HandPresence : MonoBehaviour
+{
+    // Start is called before the first frame update
+    // Have the input devices [controllers] be part of detected + devices for input action
+    void Start()
+    {
+        List<InputDevice> devices = new List<InputDevice>();
+        // Fix possible bugs/gaps
+        InputDeviceCharacteristics rightControllerCharacteristics = InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller;
+        InputDevices.GetDevicesWithCharacteristics(rightControllerCharacteristics, devices);
+
+        foreach (var item in devices)
+        {
+            Debug.Log(item.name + item.characteristics);
+        }
+
+        if(devices.Count > 0)
+        { //something wrong here?
+            targetDevice = devices[0];
+        }
+    }
+
+    // Update is called once per frame
+    // Why are there bugs in between the empty lines?
+    void Update()
+    {
+        if (targetDevice.TryGetFeatureValue(CommonUsages.primaryButton, out bool primaryButtonValue) && primaryButtonValue)
+           Debug.Log("Pressing Primary Button");
+
+        if (targetDevice.TryGetFeatureValue(CommonUsages.trigger, out float triggerValue) && triggerValue > 0.1f)
+            Debug.Log("Trigger pressed" + triggerValue);
+
+        if (targetDevice.TryGetFeatureValue(CommonUsages.primary2DAxis , out Vector2 primary2DAxisValue) && primary2DAxisValue != Vector2.zero)
+            Debug.Log("Primary Touchpad " + primary2DAxisValue);
+    }
+}
